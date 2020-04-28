@@ -1,6 +1,6 @@
 fname = input("Enter file name: ")
 fh = open(fname)
-ts=fh.read()
+ts=fh.read()    #convert file to string
 lst = list()
 for line in ts.split():
     if line not in lst:
