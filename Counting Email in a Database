@@ -1,0 +1,32 @@
+import sqlite3
+
+conn=sqlite3.connect('emaildb.sqlite') #連接資料庫，若無此檔會自動創建
+cur=conn.cursor() #建立Cursor物件，用來操作資料庫
+
+cur.execute('DROP TABLE IF EXISTS Counts') #若存在此table則刪除
+
+cur.execute('CREATE TABLE Counts (org TEXT, count INTEGER)')#創建table
+
+fname=input('Enter: ')
+fh=open(fname)
+
+for line in fh:
+    if not line.startswith('From: '): continue #找開頭為From: 的段落    
+    pieces=line.split() #將段落拆為單字
+    email=pieces[1]
+    st=email.find('@')
+    org=email[st+1:]
+    cur.execute('SELECT count FROM Counts WHERE org=?', (org,)) # ?為pacleholder
+    row=cur.fetchone() #讀取目前 Cursor 物件所指之下一筆紀錄, 若無傳回 None
+    if row is None:
+        cur.execute('''INSERT INTO Counts(org, count)
+                    VALUES (?, 1)''', (org,)) #若第一次出現，count值=1
+    else:
+        cur.execute('UPDATE Counts SET count=count+1 WHERE org=?', (org,)) #更新count
+    conn.commit() #將這些操作變更至資料庫中
+
+sqlstr='SELECT org, count FROM Counts ORDER BY count DESC LIMIT 10' #選擇次數前10多的EMAIL
+
+for row in cur.execute(sqlstr):
+    print(row[0],row[1])
+cur.close() #關閉資料庫連線
