@@ -16,7 +16,7 @@ for line in fh:
     email=pieces[1]
     st=email.find('@')
     org=email[st+1:]
-    cur.execute('SELECT count FROM Counts WHERE org=?', (org,)) # ?為pacleholder
+    cur.execute('SELECT count FROM Counts WHERE org=?', (org,)) # ?為placeholder
     row=cur.fetchone() #讀取目前 Cursor 物件所指之下一筆紀錄, 若無傳回 None
     if row is None:
         cur.execute('''INSERT INTO Counts(org, count)
